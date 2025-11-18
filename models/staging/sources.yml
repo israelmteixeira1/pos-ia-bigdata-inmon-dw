@@ -1,0 +1,18 @@
+version: 2
+
+sources:
+  - name: staging
+    database: NORTHWIND_EDW
+    schema: STAGING
+    tables:
+      - name: customers
+      - name: orders
+      - name: order_details
+      - name: products
+      - name: categories
+      - name: suppliers
+      - name: employees
+      - name: shippers
+      - name: regions
+      - name: territories
+      - name: employee_territories
