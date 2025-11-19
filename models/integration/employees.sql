@@ -1,28 +1,28 @@
 {{ config(materialized='table', schema='integration') }}
 
 SELECT
-    employee_id,
-    last_name,
-    first_name,
+    employeeid,
+    lastname,
+    firstname,
     title,
-    title_of_courtesy,
-    birth_date,
-    hire_date,
+    titleofcourtesy,
+    birthdate,
+    hiredate,
     address,
     city,
     region,
-    postal_code,
+    postalcode,
     country,
-    home_phone,
+    homephone,
     extension,
     photo,
     notes,
-    reports_to,
+    reportsto,
     -- Derivado: Idade do funcionário
-    FLOOR(DATEDIFF(day, birth_date, CURRENT_DATE()) / 365.25) as age,
+    FLOOR(DATEDIFF(day, birthdate, CURRENT_DATE()) / 365.25) as age,
     -- Derivado: Anos de casa (tempo desde contratação)
-    FLOOR(DATEDIFF(day, hire_date, CURRENT_DATE()) / 365.25) as years_with_company,
+    FLOOR(DATEDIFF(day, hiredate, CURRENT_DATE()) / 365.25) as years_with_company,
     CURRENT_TIMESTAMP() as edw_inserted_at,
     'northwind_staging' as source_system
-FROM {{ source('staging', 'employees') }}
-WHERE employee_id IS NOT NULL;
+FROM {{ source('staging', 'EMPLOYEES') }}
+WHERE employeeid IS NOT NULL

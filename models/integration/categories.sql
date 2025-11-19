@@ -1,10 +1,13 @@
-{{ config(materialized='table', schema='integration') }}
+{{ config(
+    materialized='table',
+    schema='integration'
+) }}
 
 SELECT
-    category_id,
-    category_name,
-    description,
-    CURRENT_TIMESTAMP() as edw_inserted_at,
-    'northwind_staging' as source_system
-FROM {{ source('staging', 'categories') }}
-WHERE category_id IS NOT NULL;
+    CATEGORYID        AS category_id,
+    CATEGORYNAME      AS category_name,
+    DESCRIPTION       AS description,
+    CURRENT_TIMESTAMP() AS edw_inserted_at,
+    'northwind_staging' AS source_system
+FROM {{ source('staging', 'CATEGORIES') }}
+WHERE CATEGORYID IS NOT NULL

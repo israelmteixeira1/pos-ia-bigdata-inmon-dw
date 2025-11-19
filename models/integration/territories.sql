@@ -1,10 +1,10 @@
 {{ config(materialized='table', schema='integration') }}
 
 SELECT
-    territory_id,
-    territory_description,
-    region_id,
+    territoryid,
+    territorydescription,
+    regionid,
     CURRENT_TIMESTAMP() as edw_inserted_at,
     'northwind_staging' as source_system
-FROM {{ source('staging', 'territories') }}
-WHERE territory_id IS NOT NULL;
+FROM {{ source('staging', 'TERRITORIES') }}
+WHERE territoryid IS NOT NULL

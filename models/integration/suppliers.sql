@@ -1,14 +1,14 @@
 {{ config(materialized='table', schema='integration') }}
 
 SELECT
-    supplier_id,
-    company_name,
-    contact_name,
-    contact_title,
+    supplierid,
+    companyname,
+    contactname,
+    contacttitle,
     address,
     city,
     region,
-    postal_code,
+    postalcode,
     country,
     phone,
     fax,
@@ -22,5 +22,5 @@ SELECT
     END as region_group,
     CURRENT_TIMESTAMP() as edw_inserted_at,
     'northwind_staging' as source_system
-FROM {{ source('staging', 'suppliers') }}
-WHERE supplier_id IS NOT NULL;
+FROM {{ source('staging', 'SUPPLIERS') }}
+WHERE supplierid IS NOT NULL
