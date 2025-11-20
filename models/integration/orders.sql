@@ -1,20 +1,20 @@
 {{ config(materialized='table', schema='integration') }}
 
 SELECT
-    orderid,
-    customerid,
-    employeeid,
-    orderdate,
-    requireddate,
-    shippeddate,
-    shipvia AS shipperid,
+    orderid AS order_id,
+    customerid AS customer_id,
+    employeeid AS employee_id,
+    orderdate AS order_date,
+    requireddate AS required_date,
+    shippeddate AS shipped_date,
+    shipvia AS ship_via,
     freight,
-    shipname,
-    shipaddress,
-    shipcity,
-    shipregion,
-    shippostalcode,
-    shipcountry,
+    shipname AS ship_name,
+    shipaddress AS ship_address,
+    shipcity AS ship_city,
+    shipregion AS ship_region,
+    shippostalcode AS ship_postal_code,
+    shipcountry AS ship_country,
     -- Derivado: Dias para envio, útil para medir eficiência logística
     DATEDIFF(day, orderdate, shippeddate) AS daystoship,
     -- Derivado: Status de entrega (no prazo ou não)

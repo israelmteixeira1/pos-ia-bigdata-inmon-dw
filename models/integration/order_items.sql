@@ -1,9 +1,9 @@
 {{ config(materialized='table', schema='integration') }}
 
 SELECT
-    orderid,
-    productid,
-    unitprice,
+    orderid AS order_id,
+    productid AS product_id,
+    unitprice AS unit_price,
     quantity,
     discount,
     -- Derivado: Valor bruto do item (antes de desconto)

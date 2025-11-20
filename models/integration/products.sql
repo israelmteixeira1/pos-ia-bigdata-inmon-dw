@@ -1,15 +1,15 @@
 {{ config(materialized='table', schema='integration') }}
 
 SELECT
-    productid,
-    productname,
-    supplierid,
-    categoryid,
-    quantityperunit,
-    unitprice,
-    unitsinstock,
-    unitsonorder,
-    reorderlevel,
+    productid AS product_id,
+    productname AS product_name,
+    supplierid AS supplier_id,
+    categoryid AS category_id,
+    quantityperunit AS quantity_per_unit,
+    unitprice AS unit_price,
+    unitsinstock AS units_in_stock,
+    unitsonorder AS units_on_order,
+    reorderlevel AS reorder_level,
     discontinued,
     -- Derivado: Status do estoque do produto
     CASE 
