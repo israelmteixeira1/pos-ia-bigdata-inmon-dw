@@ -29,7 +29,10 @@ sample_items as (
         o.QUANTITY                       as quantity,
         -- TOTAL é subtotal + imposto; aqui usamos SUBTOTAL como unit_price aproximado
         o.SUBTOTAL / nullif(o.QUANTITY, 0) as unit_price,
-        o.DISCOUNT                       as discount
+        CASE
+            WHEN o.DISCOUNT > 1 THEN o.DISCOUNT / 100.0  -- 67 -> 0.67
+            ELSE o.DISCOUNT
+        END                              as discount
     from {{ source('staging', 'SAMPLE_DB_ORDERS') }} o
 ),
 
