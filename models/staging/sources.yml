@@ -1,7 +1,7 @@
 version: 2
 
 sources:
-  - name: staging  
+  - name: staging
     database: NORTHWIND_EDW
     schema: STAGING
     tables:
@@ -16,3 +16,13 @@ sources:
       - name: SUPPLIERS
       - name: TERRITORIES
       - name: EMPLOYEE_TERRITORIES
+
+      # Tabelas do Sample Database do Metabase
+      - name: SAMPLE_DB_ACCOUNTS
+      - name: SAMPLE_DB_ANALITYCS_EVENTS
+      - name: SAMPLE_DB_FEEDBACK
+      - name: SAMPLE_DB_INVOICES
+      - name: SAMPLE_DB_ORDERS
+      - name: SAMPLE_DB_PEOPLE
+      - name: SAMPLE_DB_PRODUCTS
+      - name: SAMPLE_DB_REVIEWS
