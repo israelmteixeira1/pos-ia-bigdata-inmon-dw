@@ -1,30 +1,73 @@
-{{ config(materialized='table', schema='integration') }}
+{{ config(
+    materialized = 'table',
+    schema       = 'INTEGRATION',
+    alias        = 'ORDERS'
+) }}
 
-SELECT
-    orderid AS order_id,
-    customerid AS customer_id,
-    employeeid AS employee_id,
-    orderdate AS order_date,
-    requireddate AS required_date,
-    shippeddate AS shipped_date,
-    shipvia AS ship_via,
+with nw_orders as (
+    select
+        cast(o.OrderID as varchar)    as order_business_id,
+        'NORTHWIND'                   as source_system,
+        cast(o.CustomerID as varchar) as customer_business_id,
+        cast(o.EmployeeID as varchar) as employee_business_id,
+        cast(o.ShipVia as varchar)    as shipper_business_id,
+        o.OrderDate::string           as order_date,
+        o.RequiredDate::string        as required_date,
+        o.ShippedDate::string         as shipped_date,
+        o.Freight                     as freight,
+        o.ShipName                    as ship_name,
+        o.ShipAddress                 as ship_address,
+        o.ShipCity                    as ship_city,
+        o.ShipRegion                  as ship_region,
+        o.ShipPostalCode              as ship_postal_code,
+        o.ShipCountry                 as ship_country
+    from {{ source('staging', 'ORDERS') }} o
+),
+
+sample_orders as (
+    select
+        cast(ID as varchar)           as order_business_id,
+        'SAMPLE_DB'                   as source_system,
+        cast(USER_ID as varchar)      as customer_business_id,
+        null                          as employee_business_id,
+        null                          as shipper_business_id,
+        CREATED_AT                    as order_date,
+        CREATED_AT                    as required_date,
+        CREATED_AT                    as shipped_date,
+        TOTAL                         as freight,
+        null                          as ship_name,
+        null                          as ship_address,
+        null                          as ship_city,
+        null                          as ship_region,
+        null                          as ship_postal_code,
+        null                          as ship_country
+    from {{ source('staging', 'SAMPLE_DB_ORDERS') }}
+),
+
+union_all as (
+    select * from nw_orders
+    union all
+    select * from sample_orders
+)
+
+select
+    {{ dbt_utils.generate_surrogate_key(['order_business_id','source_system']) }} as order_id,
+    order_business_id,
+    source_system,
+    customer_business_id,
+    employee_business_id,
+    shipper_business_id,
+    order_date,
+    required_date,
+    shipped_date,
     freight,
-    shipname AS ship_name,
-    shipaddress AS ship_address,
-    shipcity AS ship_city,
-    shipregion AS ship_region,
-    shippostalcode AS ship_postal_code,
-    shipcountry AS ship_country,
-    -- Derivado: Dias para envio, útil para medir eficiência logística
-    DATEDIFF(day, orderdate, shippeddate) AS daystoship,
-    -- Derivado: Status de entrega (no prazo ou não)
-    CASE
-        WHEN shippeddate IS NULL THEN 'PENDING'
-        WHEN shippeddate <= requireddate THEN 'ON_TIME'
-        ELSE 'LATE'
-    END AS deliverystatus,
-    -- Metadados
-    CURRENT_TIMESTAMP() as edw_inserted_at,
-    'northwind_staging' as source_system
-FROM {{ source('staging', 'ORDERS') }}
-WHERE orderid IS NOT NULL
+    ship_name,
+    ship_address,
+    ship_city,
+    ship_region,
+    ship_postal_code,
+    ship_country,
+    current_timestamp()       as valid_from,
+    cast(null as timestamp)   as valid_to,
+    1                         as current_flag
+from union_all

@@ -1,19 +1,52 @@
-{{ config(materialized='table', schema='integration') }}
+{{ config(
+    materialized = 'table',
+    schema       = 'INTEGRATION',
+    alias        = 'ORDER_ITEMS'
+) }}
 
-SELECT
-    orderid AS order_id,
-    productid AS product_id,
-    unitprice AS unit_price,
+with nw_items as (
+    select
+        {{ dbt_utils.generate_surrogate_key(
+            ['cast(od.OrderID as varchar)', 'cast(od.ProductID as varchar)', '\'NORTHWIND\'']
+        ) }}                             as order_item_id,
+        cast(od.OrderID as varchar)      as order_business_id,
+        'NORTHWIND'                      as source_system,
+        cast(od.ProductID as varchar)    as product_business_id,
+        od.Quantity                      as quantity,
+        od.UnitPrice                     as unit_price,
+        od.Discount                      as discount
+    from {{ source('staging', 'ORDERS_DETAILS') }} od
+),
+
+sample_items as (
+    select
+        {{ dbt_utils.generate_surrogate_key(
+            ['cast(o.ID as varchar)', 'cast(o.PRODUCT_ID as varchar)', '\'SAMPLE_DB\'']
+        ) }}                             as order_item_id,
+        cast(o.ID as varchar)            as order_business_id,
+        'SAMPLE_DB'                      as source_system,
+        cast(o.PRODUCT_ID as varchar)    as product_business_id,
+        o.QUANTITY                       as quantity,
+        -- TOTAL é subtotal + imposto; aqui usamos SUBTOTAL como unit_price aproximado
+        o.SUBTOTAL / nullif(o.QUANTITY, 0) as unit_price,
+        o.DISCOUNT                       as discount
+    from {{ source('staging', 'SAMPLE_DB_ORDERS') }} o
+),
+
+union_all as (
+    select * from nw_items
+    union all
+    select * from sample_items
+)
+
+select
+    order_item_id,
+    order_business_id,
+    source_system,
+    product_business_id,
     quantity,
+    unit_price,
     discount,
-    -- Derivado: Valor bruto do item (antes de desconto)
-    unitprice * quantity AS gross_amount,
-    -- Derivado: Valor líquido do item (após desconto)
-    unitprice * quantity * (1 - discount) AS net_amount,
-    -- Derivado: Valor absoluto do desconto dado
-    unitprice * quantity * discount AS discount_amount,
-    -- Metadados
-    CURRENT_TIMESTAMP() as edw_inserted_at,
-    'northwind_staging' as source_system
-FROM {{ source('staging', 'ORDERS_DETAILS') }}
-WHERE orderid IS NOT NULL AND productid IS NOT NULL
+    quantity * unit_price * (1 - discount) as line_amount,
+    current_timestamp()                    as loaded_at
+from union_all
