@@ -1,13 +1,13 @@
 {{ config(materialized='table', schema='presentation') }}
 
-SELECT
+select
   order_id,
-  customer_id,
-  employee_id,
+  customer_business_id as customer_id,
+  employee_business_id as employee_id,
   order_date,
   required_date,
   shipped_date,
-  ship_via,
+  shipper_business_id   as ship_via,
   freight,
   ship_name,
   ship_address,
@@ -15,4 +15,4 @@ SELECT
   ship_region,
   ship_postal_code,
   ship_country
-FROM {{ ref('orders') }}
+from {{ ref('orders') }}
