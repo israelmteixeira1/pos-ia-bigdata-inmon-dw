@@ -3,7 +3,7 @@
 select
   o.order_id                            as sale_id,
   o.order_date,
-  o.customer_business_id                as customer_id,
+  o.customer_id,
   oi.product_business_id                as product_id,
   oi.quantity,
   oi.unit_price,

@@ -48,13 +48,23 @@ union_all as (
     select * from nw_orders
     union all
     select * from sample_orders
+),
+
+orders_enriched as (
+    select
+        ua.*,
+        c.customer_id   -- ID artificial vindo de INTEGRATION.CUSTOMERS
+    from union_all ua
+    left join {{ ref('customers') }} c
+      on ua.customer_business_id = c.customer_business_id
+     and ua.source_system        = c.source_system
 )
 
 select
     {{ dbt_utils.generate_surrogate_key(['order_business_id','source_system']) }} as order_id,
     order_business_id,
     source_system,
-    customer_business_id,
+    customer_id,          -- << AGORA USA O ID ARTIFICIAL
     employee_business_id,
     shipper_business_id,
     order_date,
@@ -70,4 +80,4 @@ select
     current_timestamp()       as valid_from,
     cast(null as timestamp)   as valid_to,
     1                         as current_flag
-from union_all
+from orders_enriched

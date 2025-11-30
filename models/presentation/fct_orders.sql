@@ -2,7 +2,7 @@
 
 select
   order_id,
-  customer_business_id as customer_id,
+  customer_id,
   employee_business_id as employee_id,
   order_date,
   required_date,
