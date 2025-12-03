@@ -26,10 +26,10 @@ sample_products as (
         'SAMPLE'                       as source_system,
         p.title                        as product_name,
         cast(null as varchar)          as supplier_business_id,
-        p.category                     as category_business_id,  -- vai fazer lookup depois
+        p.category                     as category_business_id,
         cast(null as varchar)          as quantity_per_unit,
         p.price                        as unit_price,
-        0                              as units_in_stock,
+        uniform(0, 40, random())       as units_in_stock,
         cast(null as int)              as units_on_order,
         cast(null as int)              as reorder_level,
         0                              as discontinued
