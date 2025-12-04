@@ -30,8 +30,8 @@ sample_products as (
         cast(null as varchar)          as quantity_per_unit,
         p.price                        as unit_price,
         uniform(0, 40, random())       as units_in_stock,
-        cast(null as int)              as units_on_order,
-        cast(null as int)              as reorder_level,
+        uniform(0, 40, random())       as units_on_order,
+        uniform(0, 15, random())       as reorder_level,
         0                              as discontinued
     from {{ source('staging', 'SAMPLE_DB_PRODUCTS') }} p
 ),
