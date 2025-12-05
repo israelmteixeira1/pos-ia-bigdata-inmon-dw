@@ -26,3 +26,6 @@ sources:
       - name: SAMPLE_DB_PEOPLE
       - name: SAMPLE_DB_PRODUCTS
       - name: SAMPLE_DB_REVIEWS
+
+      #Tabelas de Taxa de câmbio (dado externo)
+      - name: EXCHANGE_RATE
